@@ -9,7 +9,7 @@ from subprocess import call as spcall, Popen, PIPE
 import hashlib
 import shutil
 from terminaltables import SingleTable
-
+ 
 # Alias FileNotFoundError for Python 2
 try:
     FileNotFoundError
@@ -29,7 +29,7 @@ def call(args, context):
         'delete': delete
     }
 
-    if parsed.command is None or (parsed.command is None and parsed.help):
+    if parsed.command is None:
         parser.print_help()
         print_available_commands(commands)
         sys.exit(0)
@@ -44,6 +44,7 @@ def create_varmap(context):
     tf_var_map = {
         'node_type': {
             'name': 'server_type_node',
+            # TODO: Make this node type dynamic with API client
             'default': 'g6-standard-2',
         },
         'nodes': {
@@ -52,6 +53,7 @@ def create_varmap(context):
         },
         'master_type': {
             'name': 'server_type_master',
+            # TODO: Make this node type dynamic with API client
             'default': 'g6-standard-2',
         },
         'region': {
@@ -182,7 +184,7 @@ def create(args, context):
                   '{}@{}'.format(get_kubeconfig_user(prefix, parsed.name), parsed.name)])
 
     print("Your cluster has been created and your kubectl context updated.\n\n"
-          "Try the following command: \n"
+          "Try the following command:\n"
           "kubectl get pods --all-namespaces\n\n"
           "Come hang out with us in #linode on the Kubernetes Slack! http://slack.k8s.io/")
 
@@ -237,7 +239,8 @@ def check_for_ssh_agent(parsed):
         if pid.returncode == 2:
             need_agent_start = True
         # TODO if the provided pubkey name is a substring of another key name
-        # then we think that it's loaded when it's not.
+        # then we think that it's loaded when it's not, and we won't print 
+        # the warning
         if privkey_name not in stdout:
             print_warning = True
     except FileNotFoundError:
@@ -295,7 +298,7 @@ def bare_int_or_quoted_value(val):
         return '"{}"'.format(val)
     else:
         # Important that we return this string rather than an empty string
-        # because the callee expects some non-empty value
+        # because the caller expects some non-empty value
         return '""'
 
 def gen_terraform_file(context, tf_var_map, cluster_name, prefix):

@@ -9,8 +9,8 @@ ifeq ($(PYTHON), 3)
 	PYCMD=python3
 	PIPCMD=pip3
 else
-	PYCMD=python
-	PIPCMD=pip
+	PYCMD=python2
+	PIPCMD=pip2
 endif
 
 install: check-prerequisites requirements build
@@ -18,7 +18,7 @@ install: check-prerequisites requirements build
 
 .PHONY: build
 build: clean
-	python -m linodecli bake ${SPEC} --skip-config
+	python2 -m linodecli bake ${SPEC} --skip-config
 	python3 -m linodecli bake ${SPEC} --skip-config
 	cp data-2 linodecli/
 	cp data-3 linodecli/
@@ -26,14 +26,14 @@ build: clean
 
 .PHONY: requirements
 requirements:
-	pip install -r requirements.txt
+	pip2 install -r requirements.txt
 	pip3 install -r requirements.txt
 
 .PHONY: check-prerequisites
 check-prerequisites:
-	@ pip -v >/dev/null
+	@ pip2 -v >/dev/null
 	@ pip3 -v >/dev/null
-	@ python -V >/dev/null
+	@ python2 -V >/dev/null
 	@ python3 -V >/dev/null
 
 .PHONY: clean
